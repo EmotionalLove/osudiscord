@@ -32,10 +32,26 @@ public class LinkManager {
     }
 
     @Nullable
-    public static String read(String discordid) throws IOException {
-        YML yml = new YML(getTheYml());
-        if (!yml.exists("user_" + discordid)) return null;
-        return yml.getString("user_" + discordid);
+    public static String read(String discordid) {
+        try {
+            YML yml = new YML(getTheYml());
+            if (!yml.exists("user_" + discordid)) return null;
+            return yml.getString("user_" + discordid);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static boolean hasLinkedAccount(String userid) {
+        YML yml = null;
+        try {
+            yml = new YML(getTheYml());
+            return yml.exists("user_" + userid);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
 

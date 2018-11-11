@@ -21,7 +21,7 @@ public class LinkCommand extends SimpleCommand {
             return;
         }
         try {
-            LinkManager.link(DiscordEventHandler.lastMessage.getAuthor().getId(), this.getArguments()[1]);
+            LinkManager.link(DiscordEventHandler.lastMessage.getAuthor().getId(), this.getArguments()[0]);
             EmbedBuilder builder = new EmbedBuilder();
             builder.setTitle("Linked!");
             builder.setDescription("Your osu! account has been linked.");
