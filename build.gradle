@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+group 'com.sasha'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation 'com.github.oopsjpeg:osu4j:2.0.1'
+    implementation 'net.dv8tion:JDA:3.8.0_423'
+    implementation 'com.github.EmotionalLove:SimpleSettingSystem:e2aaa43f25'
+    implementation(files("libs/SimpleCommandSystem.jar"))
+}
