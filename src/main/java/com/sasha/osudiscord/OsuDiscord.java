@@ -1,6 +1,9 @@
 package com.sasha.osudiscord;
 
 import com.oopsjpeg.osu4j.backend.Osu;
+import com.sasha.osudiscord.command.CalcCommand;
+import com.sasha.osudiscord.command.RecentCommand;
+import com.sasha.osudiscord.command.TopCommand;
 import com.sasha.osudiscord.command.UserCommand;
 import com.sasha.simplecmdsys.SimpleCommandProcessor;
 import com.sasha.simplesettings.SettingHandler;
@@ -30,6 +33,9 @@ public class OsuDiscord {
     public void start() throws LoginException, InterruptedException, InstantiationException, IllegalAccessException {
         System.out.println("Connecting to Discord...");
         COMMAND_PROCESSOR.register(UserCommand.class);
+        COMMAND_PROCESSOR.register(RecentCommand.class);
+        COMMAND_PROCESSOR.register(CalcCommand.class);
+        COMMAND_PROCESSOR.register(TopCommand.class);
         jdaDiscord = new JDABuilder(config.discordBotToken).buildBlocking();
         jdaDiscord.setEventManager(new AnnotatedEventManager());
         jdaDiscord.addEventListener(new DiscordEventHandler()); // register events

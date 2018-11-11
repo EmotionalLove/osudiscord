@@ -1,5 +1,6 @@
 package com.sasha.osudiscord;
 
+import com.oopsjpeg.osu4j.GameMod;
 import com.oopsjpeg.osu4j.OsuBeatmap;
 import com.oopsjpeg.osu4j.OsuScore;
 import com.oopsjpeg.osu4j.OsuUser;
@@ -17,6 +18,23 @@ import java.net.MalformedURLException;
 public class DiscordEventHandler {
 
     public static Message lastMessage;
+
+    private static int getColourCodeForRank(String rank) {
+        switch (rank) {
+            case "A":
+                return 0x00ff11;
+            case "B":
+                return 0x9dff00;
+            case "C":
+                return 0xffe100;
+            case "D":
+                return 0xff6e00;
+            case "F":
+                return 0xff0000;
+            default:
+                return 0xff77f5;
+        }
+    }
 
     @SubscribeEvent
     public void onGuildMsgRx(GuildMessageReceivedEvent e) {
@@ -40,15 +58,32 @@ public class DiscordEventHandler {
             return builder.build();
         }
 
-        public static MessageEmbed makeOsuScoreEmbed(OsuScore score) throws OsuAPIException {
+        public static MessageEmbed makeOsuScoreEmbed(OsuScore score) throws OsuAPIException, MalformedURLException {
             EmbedBuilder builder = new EmbedBuilder();
             OsuUser user = score.getUser().get();
             OsuBeatmap map = score.getBeatmap().get();
-            builder.setTitle(user.getUsername() + " - " + map.getTitle());
+            boolean comma = false;
+            StringBuilder mods = new StringBuilder("**Mods**: ");
+            for (GameMod enabledMod : score.getEnabledMods()) {
+                if (!comma) {
+                    mods.append(enabledMod.getName());
+                    comma = true;
+                    continue;
+                }
+                mods.append(", ").append(enabledMod.getName());
+            }
+            builder.setColor(getColourCodeForRank(score.getRank()));
+            builder.setTitle(user.getUsername() + " - " + map.getTitle(), map.getURL().toString());
             builder.setDescription("**Difficulty** > " + map.getDifficulty() + "\n" +
-                    "**PP** > " + score.getPp());
+                    "**PP** > " + (score.hadPp() ? score.getPp() : ":shrug: n/a") + "\n" +
+                    "**激's**: " + score.getGekis() + " | **喝's**: " + score.getKatus() + " | **300's**: " + score.getHit300() + " | **100's**: " + score.getHit100() + " | **50's**: " + score.getHit50() + " | **X's**: " + score.getMisses() + "\n" +
+                    "**Rank for beatmap** > " + score.getRank() + "\n" +
+                    "**Max Combo Ratio** > " + score.getMaxCombo() + ":" + map.getMaxCombo() + "\n" +
+                    mods.toString());
+            builder.setImage("https://assets.ppy.sh/beatmaps/{}/covers/cover.jpg".replace("{}", "" + map.getBeatmapSetID()));
             return builder.build();
         }
+
         public static MessageEmbed makeOsuUserEmbed(OsuUser usr) throws MalformedURLException {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setTitle(usr.getUsername(), usr.getURL().toString());
@@ -57,10 +92,9 @@ public class DiscordEventHandler {
                     "**Level** > " + usr.getLevel() + "\n" +
                     "**Rank** > " + usr.getRank() + "\n" +
                     "**Country** > " + usr.getCountry().getName() + " :flag_" + usr.getCountry().getAlpha2().toLowerCase() + ":");
-            builder.setThumbnail("https://osu.ppy.sh/images/layout/avatar-guest.png");
+            builder.setThumbnail("https://a.ppy.sh/" + usr.getID());
             return builder.build();
         }
-
     }
 
 }

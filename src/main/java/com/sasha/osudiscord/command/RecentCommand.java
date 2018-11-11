@@ -1,15 +1,19 @@
 package com.sasha.osudiscord.command;
 
+import com.oopsjpeg.osu4j.OsuScore;
 import com.oopsjpeg.osu4j.OsuUser;
+import com.oopsjpeg.osu4j.backend.EndpointUserRecents;
 import com.oopsjpeg.osu4j.backend.EndpointUsers;
 import com.sasha.osudiscord.DiscordEventHandler;
 import com.sasha.osudiscord.OsuDiscord;
 import com.sasha.simplecmdsys.SimpleCommand;
 
-public class UserCommand extends SimpleCommand {
+import java.util.List;
 
-    public UserCommand() {
-        super("user");
+public class RecentCommand extends SimpleCommand {
+
+    public RecentCommand() {
+        super("recent");
     }
 
     @Override public void onCommand() {
@@ -21,14 +25,15 @@ public class UserCommand extends SimpleCommand {
         }
         String user = this.getArguments()[0];
         try {
-            EndpointUsers.Arguments args = new EndpointUsers.ArgumentsBuilder(user).build();
-            OsuUser osuUser = OsuDiscord.INSTANCE.osuApi.users.query(args);
-            DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeOsuUserEmbed(osuUser)).submit();
+            EndpointUserRecents.Arguments args = new EndpointUserRecents.ArgumentsBuilder(user).setUserName(user).setLimit(2).build();
+            OsuScore osus = OsuDiscord.INSTANCE.osuApi.userRecents.query(args).get(0);
+            DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeOsuScoreEmbed(osus)).submit();
         } catch (Exception e) {
+            e.printStackTrace();
             DiscordEventHandler.lastMessage
                     .getChannel()
                     .sendMessage(DiscordEventHandler.Util
-                            .makeErrorEmbed("Invalid User?", "An exception occurred whilst trying to retrieve this user... Is the username valid?", null)).submit();
+                            .makeErrorEmbed("Invalid User?", "An exception occurred whilst trying to retrieve this user... Is the username valid? Or maybe they've never played osu?", null)).submit();
         }
     }
 }
