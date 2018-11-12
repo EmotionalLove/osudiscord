@@ -8,7 +8,9 @@ import com.sasha.osudiscord.DiscordEventHandler;
 import com.sasha.osudiscord.LinkManager;
 import com.sasha.osudiscord.OsuDiscord;
 import com.sasha.simplecmdsys.SimpleCommand;
+import com.sasha.simplecmdsys.SimpleCommandInfo;
 
+@SimpleCommandInfo(description = "See a user's best play", syntax = "[username]")
 public class TopCommand extends SimpleCommand {
 
     public TopCommand() {

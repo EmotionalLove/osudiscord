@@ -11,9 +11,12 @@ import com.sasha.osudiscord.DiscordEventHandler;
 import com.sasha.osudiscord.LinkManager;
 import com.sasha.osudiscord.OsuDiscord;
 import com.sasha.simplecmdsys.SimpleCommand;
+import com.sasha.simplecmdsys.SimpleCommandInfo;
 
 import java.util.List;
 
+@SimpleCommandInfo(description = "Show the most recent beatmap you've played",
+syntax = {"[username]"})
 public class RecentCommand extends SimpleCommand {
 
     public RecentCommand() {

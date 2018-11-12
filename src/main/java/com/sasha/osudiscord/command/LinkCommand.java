@@ -3,10 +3,12 @@ package com.sasha.osudiscord.command;
 import com.sasha.osudiscord.DiscordEventHandler;
 import com.sasha.osudiscord.LinkManager;
 import com.sasha.simplecmdsys.SimpleCommand;
+import com.sasha.simplecmdsys.SimpleCommandInfo;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.io.IOException;
 
+@SimpleCommandInfo(description = "Link your osu! account to the bot", syntax = {"<username>"})
 public class LinkCommand extends SimpleCommand {
 
     public LinkCommand() {

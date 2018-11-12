@@ -2,12 +2,14 @@ package com.sasha.osudiscord.command;
 
 import com.sasha.osudiscord.DiscordEventHandler;
 import com.sasha.simplecmdsys.SimpleCommand;
+import com.sasha.simplecmdsys.SimpleCommandInfo;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Webhook;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookMessageBuilder;
 
+@SimpleCommandInfo(description = "Mimic another user", syntax = {"<username> <message>"})
 public class MimicCommand extends SimpleCommand {
 
     public MimicCommand() {

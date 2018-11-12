@@ -5,7 +5,10 @@ import com.oopsjpeg.osu4j.backend.EndpointUsers;
 import com.sasha.osudiscord.DiscordEventHandler;
 import com.sasha.osudiscord.OsuDiscord;
 import com.sasha.simplecmdsys.SimpleCommand;
+import com.sasha.simplecmdsys.SimpleCommandInfo;
 
+@SimpleCommandInfo(description = "Show someone's osu! profile",
+syntax = {"<username>"})
 public class UserCommand extends SimpleCommand {
 
     public UserCommand() {

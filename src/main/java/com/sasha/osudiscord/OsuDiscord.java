@@ -35,6 +35,7 @@ public class OsuDiscord {
         COMMAND_PROCESSOR.register(CalcCommand.class);
         COMMAND_PROCESSOR.register(TopCommand.class);
         COMMAND_PROCESSOR.register(MimicCommand.class);
+        COMMAND_PROCESSOR.register(HelpCommand.class);
         COMMAND_PROCESSOR.register(LinkCommand.class);
         jdaDiscord = new JDABuilder(config.discordBotToken).buildBlocking();
         jdaDiscord.setEventManager(new AnnotatedEventManager());
