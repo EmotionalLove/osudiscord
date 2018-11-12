@@ -1,7 +1,10 @@
 package com.sasha.osudiscord.command;
 
+import com.oopsjpeg.osu4j.OsuBeatmap;
 import com.oopsjpeg.osu4j.OsuScore;
 import com.oopsjpeg.osu4j.OsuUser;
+import com.oopsjpeg.osu4j.backend.EndpointBeatmaps;
+import com.oopsjpeg.osu4j.backend.EndpointScores;
 import com.oopsjpeg.osu4j.backend.EndpointUserRecents;
 import com.oopsjpeg.osu4j.backend.EndpointUsers;
 import com.sasha.osudiscord.DiscordEventHandler;
@@ -32,9 +35,9 @@ public class RecentCommand extends SimpleCommand {
         }
         String user = flag ? LinkManager.read(DiscordEventHandler.lastMessage.getAuthor().getId()) : this.getArguments()[0];
         try {
-            EndpointUserRecents.Arguments args = new EndpointUserRecents.ArgumentsBuilder(user).setUserName(user).setLimit(2).build();
-            OsuScore osus = OsuDiscord.INSTANCE.osuApi.userRecents.query(args).get(0);
-            DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeOsuScoreEmbed(osus)).submit();
+            EndpointUserRecents.ArgumentsBuilder recent = new EndpointUserRecents.ArgumentsBuilder(user);
+            OsuScore score = OsuDiscord.INSTANCE.osuApi.userRecents.query(recent.build()).get(0);
+
         } catch (Exception e) {
             e.printStackTrace();
             DiscordEventHandler.lastMessage

@@ -75,7 +75,8 @@ public class DiscordEventHandler {
             builder.setColor(getColourCodeForRank(score.getRank()));
             builder.setTitle(user.getUsername() + " - " + map.getTitle(), map.getURL().toString());
             builder.setDescription("**Difficulty** > " + map.getDifficulty() + "\n" +
-                    "**PP** > " + (score.hadPp() ? score.getPp() : ":shrug: n/a") + "\n" +
+                    "**Score** > " + score.getScore() + "\n" +
+                    "**PP** > " + score.getPp() + "\n" +
                     "**激's**: " + score.getGekis() + " | **喝's**: " + score.getKatus() + " | **300's**: " + score.getHit300() + " | **100's**: " + score.getHit100() + " | **50's**: " + score.getHit50() + " | **X's**: " + score.getMisses() + "\n" +
                     "**Rank for beatmap** > " + score.getRank() + "\n" +
                     "**Max Combo Ratio** > " + score.getMaxCombo() + ":" + map.getMaxCombo() + "\n" +
@@ -93,6 +94,12 @@ public class DiscordEventHandler {
                     "**Rank** > " + usr.getRank() + "\n" +
                     "**Country** > " + usr.getCountry().getName() + " :flag_" + usr.getCountry().getAlpha2().toLowerCase() + ":");
             builder.setThumbnail("https://a.ppy.sh/" + usr.getID());
+            return builder.build();
+        }
+        public static MessageEmbed makeGenericEmbed(String title, String desc) {
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.setTitle(title);
+            builder.setDescription(desc);
             return builder.build();
         }
     }
