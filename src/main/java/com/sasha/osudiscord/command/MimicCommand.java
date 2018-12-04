@@ -9,6 +9,8 @@ import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.webhook.WebhookClient;
 import net.dv8tion.jda.webhook.WebhookMessageBuilder;
 
+import java.util.stream.Collectors;
+
 @SimpleCommandInfo(description = "Mimic another user", syntax = {"<username> <message>"})
 public class MimicCommand extends SimpleCommand {
 
@@ -26,6 +28,17 @@ public class MimicCommand extends SimpleCommand {
         try {
             Member member = DiscordEventHandler.lastMessage.getGuild().getMembersByName(this.getArguments()[0], true).get(0);
             DiscordEventHandler.lastMessage.getTextChannel().getWebhooks().queue(hooks -> {
+                if (hooks.stream().map(h -> h.getName()).collect(Collectors.toList()).contains("Mimi")) {
+                    Webhook hook = hooks.get(0);
+                    WebhookMessageBuilder b = new WebhookMessageBuilder();
+                    b.setUsername(member.getEffectiveName());
+                    b.setAvatarUrl(member.getUser().getAvatarUrl());
+                    b.setContent(this.getArguments()[1]);
+                    WebhookClient cli = hook.newClient().build();
+                    cli.send(b.build());
+                    cli.close();
+                    return;
+                }
                 Webhook hook = DiscordEventHandler.lastMessage.getTextChannel().createWebhook("Mimi").complete();
                 WebhookMessageBuilder b = new WebhookMessageBuilder();
                 b.setUsername(member.getEffectiveName());

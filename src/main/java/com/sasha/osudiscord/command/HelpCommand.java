@@ -10,7 +10,7 @@ import java.awt.*;
 
 import static com.sasha.osudiscord.OsuDiscord.INSTANCE;
 
-@SimpleCommandInfo(description = "Show this message")
+@SimpleCommandInfo(description = "Show this message", syntax = {""})
 public class HelpCommand extends SimpleCommand {
 
     public HelpCommand() {

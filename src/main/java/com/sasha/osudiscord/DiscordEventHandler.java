@@ -1,5 +1,6 @@
 package com.sasha.osudiscord;
 
+import com.github.francesco149.koohii.Koohii;
 import com.oopsjpeg.osu4j.GameMod;
 import com.oopsjpeg.osu4j.OsuBeatmap;
 import com.oopsjpeg.osu4j.OsuScore;
@@ -76,7 +77,7 @@ public class DiscordEventHandler {
             builder.setTitle(user.getUsername() + " - " + map.getTitle(), map.getURL().toString());
             builder.setDescription("**Difficulty** > " + map.getDifficulty() + "\n" +
                     "**Score** > " + score.getScore() + "\n" +
-                    "**PP** > " + score.getPp() + "\n" +
+                    "**PP** > " + (score.getPp() == 0f ? "Not sure" : score.getPp()) + "\n" +
                     "**激's**: " + score.getGekis() + " | **喝's**: " + score.getKatus() + " | **300's**: " + score.getHit300() + " | **100's**: " + score.getHit100() + " | **50's**: " + score.getHit50() + " | **X's**: " + score.getMisses() + "\n" +
                     "**Rank for beatmap** > " + score.getRank() + "\n" +
                     "**Max Combo Ratio** > " + score.getMaxCombo() + ":" + map.getMaxCombo() + "\n" +

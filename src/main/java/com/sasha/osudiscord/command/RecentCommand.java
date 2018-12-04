@@ -40,7 +40,7 @@ public class RecentCommand extends SimpleCommand {
         try {
             EndpointUserRecents.ArgumentsBuilder recent = new EndpointUserRecents.ArgumentsBuilder(user);
             OsuScore score = OsuDiscord.INSTANCE.osuApi.userRecents.query(recent.build()).get(0);
-
+            DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeOsuScoreEmbed(score)).submit();
         } catch (Exception e) {
             e.printStackTrace();
             DiscordEventHandler.lastMessage
