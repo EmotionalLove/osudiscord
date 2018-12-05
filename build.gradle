@@ -16,9 +16,10 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
-    implementation 'com.github.EmotionalLove:osu4j:1c8baaedf6'
+    implementation 'com.github.EmotionalLove:osu4j:35d95e3'
     implementation 'net.dv8tion:JDA:3.8.0_423'
     implementation 'com.github.EmotionalLove:SimpleSettingSystem:e2aaa43f25'
     implementation 'com.github.francesco149:koohii:1.0.15'
+    implementation 'com.github.EmotionalLove:beatmap-analyzer:a4b7edb878'
     implementation(files("libs/SimpleCommandSystem.jar"))
 }

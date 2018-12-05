@@ -1,20 +1,30 @@
 package com.sasha.osudiscord;
 
 import com.github.francesco149.koohii.Koohii;
-import com.oopsjpeg.osu4j.GameMod;
-import com.oopsjpeg.osu4j.OsuBeatmap;
-import com.oopsjpeg.osu4j.OsuScore;
-import com.oopsjpeg.osu4j.OsuUser;
+import com.oopsjpeg.osu4j.*;
 import com.oopsjpeg.osu4j.exception.OsuAPIException;
+import com.sun.corba.se.spi.servicecontext.ServiceContextRegistry;
+import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
+import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
+import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
+import lt.ekgame.beatmap_analyzer.performance.Performance;
+import lt.ekgame.beatmap_analyzer.performance.scores.Score;
+import lt.ekgame.beatmap_analyzer.utils.Mods;
+import lt.ekgame.beatmap_analyzer.utils.ScoreVersion;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.SubscribeEvent;
+import org.apache.commons.io.FileUtils;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
 
 public class DiscordEventHandler {
 
@@ -86,6 +96,35 @@ public class DiscordEventHandler {
             return builder.build();
         }
 
+        public static MessageEmbed makeOsuScoreRecentEmbed(OsuScore score) throws IOException, BeatmapException {
+            EmbedBuilder builder = new EmbedBuilder();
+            OsuUser user = score.getUser().get();
+            OsuBeatmap map = score.getBeatmap().get();
+            Performance performance = calc(score, map);
+            boolean comma = false;
+            StringBuilder mods = new StringBuilder("**Mods**: ");
+            for (GameMod enabledMod : score.getEnabledMods()) {
+                if (!comma) {
+                    mods.append(enabledMod.getName());
+                    comma = true;
+                    continue;
+                }
+                mods.append(", ").append(enabledMod.getName());
+            }
+            builder.setColor(getColourCodeForRank(score.getRank()));
+            builder.setTitle(user.getUsername() + " - " + map.getTitle(), map.getURL().toString());
+            builder.setDescription("**Difficulty** > " + map.getDifficulty() + "\n" +
+                    "**Score** > " + score.getScore() + "\n" +
+                    "**Accuracy** > " + performance.getAccuracy() + "%" + "\n" +
+                    "**PP** > " + (score.getPp() == 0f ? performance.getPerformance() : score.getPp()) + "\n" +
+                    "**激's**: " + score.getGekis() + " | **喝's**: " + score.getKatus() + " | **300's**: " + score.getHit300() + " | **100's**: " + score.getHit100() + " | **50's**: " + score.getHit50() + " | **X's**: " + score.getMisses() + "\n" +
+                    "**Rank for beatmap** > " + score.getRank() + "\n" +
+                    "**Max Combo Ratio** > " + score.getMaxCombo() + ":" + map.getMaxCombo() + "\n" +
+                    mods.toString());
+            builder.setImage("https://assets.ppy.sh/beatmaps/{}/covers/cover.jpg".replace("{}", "" + map.getBeatmapSetID()));
+            return builder.build();
+        }
+
         public static MessageEmbed makeOsuUserEmbed(OsuUser usr) throws MalformedURLException {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setTitle(usr.getUsername(), usr.getURL().toString());
@@ -103,6 +142,24 @@ public class DiscordEventHandler {
             builder.setDescription(desc);
             return builder.build();
         }
+
+
+        public static Performance calc(OsuScore score, OsuBeatmap map) throws IOException, BeatmapException {
+            int mods = 0;
+            for (GameMod enabledMod : score.getEnabledMods()) {
+                mods |= ((int) enabledMod.getBit());
+            }
+            File f = new File(map.getTitle() + ".osz");
+            FileUtils.copyURLToFile(new URL("https://osu.ppy.sh/osu/" + map.getID()), f);
+            Beatmap physicalMap = new BeatmapParser().parse(f);
+            Score s = Score.of(physicalMap)
+                    .osuAccuracy(score.getHit100(), score.getHit50(), score.getMisses())
+                    .combo(score.getMaxCombo())
+                    .version(ScoreVersion.V1)
+                    .build();
+            return physicalMap.getDifficulty(Mods.parse(mods)).getPerformance(s);
+        }
+
     }
 
 }
