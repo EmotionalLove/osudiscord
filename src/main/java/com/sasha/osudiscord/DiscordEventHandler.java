@@ -1,5 +1,6 @@
 package com.sasha.osudiscord;
 
+import com.github.francesco149.koohii.Koohii;
 import com.oopsjpeg.osu4j.GameMod;
 import com.oopsjpeg.osu4j.OsuBeatmap;
 import com.oopsjpeg.osu4j.OsuScore;
@@ -21,8 +22,7 @@ import org.apache.commons.io.FileUtils;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -69,6 +69,11 @@ public class DiscordEventHandler {
             return builder.build();
         }
 
+        public static float getMapCompletionPercent(int numObjectsTotalCurrent, int totalObjectsTotal) {
+            System.out.println(numObjectsTotalCurrent + " / " + totalObjectsTotal);
+            return  (((float)numObjectsTotalCurrent / (float)totalObjectsTotal) * 100f);
+        }
+
         @Deprecated
         public static MessageEmbed makeOsuScoreEmbed(OsuScore score) throws OsuAPIException, MalformedURLException {
             EmbedBuilder builder = new EmbedBuilder();
@@ -101,7 +106,10 @@ public class DiscordEventHandler {
             EmbedBuilder builder = new EmbedBuilder();
             OsuUser user = score.getUser().get();
             OsuBeatmap map = score.getBeatmap().get();
-            Performance performance = calc(score, map);
+            Koohii.Map pmap = getPhysicalBeatmapKoohii(map);
+            Beatmap smap = getPhysicalBeatmap(map);
+            Performance performance = calc(score, smap);
+            float progress = getMapCompletionPercent(score.getTotalHits(), smap.getObjectCount());
             boolean comma = false;
             StringBuilder mods = new StringBuilder("**Mods**: ");
             for (GameMod enabledMod : score.getEnabledMods()) {
@@ -121,6 +129,7 @@ public class DiscordEventHandler {
                     "**激's**: " + score.getGekis() + " | **喝's**: " + score.getKatus() + " | **300's**: " + score.getHit300() + " | **100's**: " + score.getHit100() + " | **50's**: " + score.getHit50() + " | **X's**: " + score.getMisses() + "\n" +
                     "**Mark for beatmap** > " + score.getRank() + "\n" +
                     "**Max Combo Ratio** > " + score.getMaxCombo() + ":" + map.getMaxCombo() + "\n" +
+                    ((progress <= 90f) ? "**In-progress completion** >" + progress + "\n" : "") +
                     mods.toString());
             builder.setImage("https://assets.ppy.sh/beatmaps/{}/covers/cover.jpg".replace("{}", "" + map.getBeatmapSetID()));
             return builder.build();
@@ -137,11 +146,24 @@ public class DiscordEventHandler {
             builder.setThumbnail("https://a.ppy.sh/" + usr.getID());
             return builder.build();
         }
+
         public static MessageEmbed makeGenericEmbed(String title, String desc) {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setTitle(title);
             builder.setDescription(desc);
             return builder.build();
+        }
+
+        public static Beatmap getPhysicalBeatmap(OsuBeatmap map) throws IOException, BeatmapException {
+            File f = new File(map.getTitle() + ".osz");
+            FileUtils.copyURLToFile(new URL("https://osu.ppy.sh/osu/" + map.getID()), f);
+            return new BeatmapParser().parse(f);
+        }
+        public static Koohii.Map getPhysicalBeatmapKoohii(OsuBeatmap map) throws IOException {
+            File f = new File(map.getTitle() + ".osz");
+            FileUtils.copyURLToFile(new URL("https://osu.ppy.sh/osu/" + map.getID()), f);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+            return new Koohii.Parser().map(reader);
         }
 
 
@@ -160,6 +182,20 @@ public class DiscordEventHandler {
                     .version(ScoreVersion.V1)
                     .build();
             return physicalMap.getDifficulty(Mods.parse(mods)).getPerformance(s);
+        }
+
+        public static Performance calc(OsuScore score, Beatmap map) {
+            int mods = 0;
+            for (GameMod enabledMod : score.getEnabledMods()) {
+                mods |= ((int) enabledMod.getBit());
+            }
+            Score s = Score.of(map)
+                    .combo(score.getMaxCombo())
+                    .score(score.getScore())
+                    .osuAccuracy(score.getHit100(), score.getHit50(), score.getMisses())
+                    .version(ScoreVersion.V1)
+                    .build();
+            return map.getDifficulty(Mods.parse(mods)).getPerformance(s);
         }
 
     }
