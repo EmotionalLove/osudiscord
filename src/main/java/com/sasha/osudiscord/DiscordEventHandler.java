@@ -1,9 +1,10 @@
 package com.sasha.osudiscord;
 
-import com.github.francesco149.koohii.Koohii;
-import com.oopsjpeg.osu4j.*;
+import com.oopsjpeg.osu4j.GameMod;
+import com.oopsjpeg.osu4j.OsuBeatmap;
+import com.oopsjpeg.osu4j.OsuScore;
+import com.oopsjpeg.osu4j.OsuUser;
 import com.oopsjpeg.osu4j.exception.OsuAPIException;
-import com.sun.corba.se.spi.servicecontext.ServiceContextRegistry;
 import lt.ekgame.beatmap_analyzer.beatmap.Beatmap;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapException;
 import lt.ekgame.beatmap_analyzer.parser.BeatmapParser;
@@ -24,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 
 public class DiscordEventHandler {
 
@@ -69,6 +69,7 @@ public class DiscordEventHandler {
             return builder.build();
         }
 
+        @Deprecated
         public static MessageEmbed makeOsuScoreEmbed(OsuScore score) throws OsuAPIException, MalformedURLException {
             EmbedBuilder builder = new EmbedBuilder();
             OsuUser user = score.getUser().get();
@@ -89,9 +90,9 @@ public class DiscordEventHandler {
                     "**Score** > " + score.getScore() + "\n" +
                     "**PP** > " + (score.getPp() == 0f ? "Not sure" : score.getPp()) + "\n" +
                     "**激's**: " + score.getGekis() + " | **喝's**: " + score.getKatus() + " | **300's**: " + score.getHit300() + " | **100's**: " + score.getHit100() + " | **50's**: " + score.getHit50() + " | **X's**: " + score.getMisses() + "\n" +
-                    "**Rank for beatmap** > " + score.getRank() + "\n" +
+                    "**Mark for beatmap** > " + score.getRank() + "\n" +
                     "**Max Combo Ratio** > " + score.getMaxCombo() + ":" + map.getMaxCombo() + "\n" +
-                    mods.toString());
+                    (mods.toString().equals("**Mods**: ") ? "No-mod" : mods.toString()));
             builder.setImage("https://assets.ppy.sh/beatmaps/{}/covers/cover.jpg".replace("{}", "" + map.getBeatmapSetID()));
             return builder.build();
         }
@@ -115,10 +116,10 @@ public class DiscordEventHandler {
             builder.setTitle(user.getUsername() + " - " + map.getTitle(), map.getURL().toString());
             builder.setDescription("**Difficulty** > " + map.getDifficulty() + "\n" +
                     "**Score** > " + score.getScore() + "\n" +
-                    "**Accuracy** > " + performance.getAccuracy() + "%" + "\n" +
-                    "**PP** > " + (score.getPp() == 0f ? performance.getPerformance() : score.getPp()) + "\n" +
+                    "**Accuracy** > " + Math.dround(performance.getAccuracy() * 100, 3) + "%" + "\n" +
+                    "**PP** > ~" + (score.getPp() == 0f ? Math.dround(performance.getPerformance(), 3) : Math.dround(score.getPp(), 3)) + "\n" +
                     "**激's**: " + score.getGekis() + " | **喝's**: " + score.getKatus() + " | **300's**: " + score.getHit300() + " | **100's**: " + score.getHit100() + " | **50's**: " + score.getHit50() + " | **X's**: " + score.getMisses() + "\n" +
-                    "**Rank for beatmap** > " + score.getRank() + "\n" +
+                    "**Mark for beatmap** > " + score.getRank() + "\n" +
                     "**Max Combo Ratio** > " + score.getMaxCombo() + ":" + map.getMaxCombo() + "\n" +
                     mods.toString());
             builder.setImage("https://assets.ppy.sh/beatmaps/{}/covers/cover.jpg".replace("{}", "" + map.getBeatmapSetID()));
@@ -153,8 +154,9 @@ public class DiscordEventHandler {
             FileUtils.copyURLToFile(new URL("https://osu.ppy.sh/osu/" + map.getID()), f);
             Beatmap physicalMap = new BeatmapParser().parse(f);
             Score s = Score.of(physicalMap)
-                    .osuAccuracy(score.getHit100(), score.getHit50(), score.getMisses())
                     .combo(score.getMaxCombo())
+                    .score(score.getScore())
+                    .osuAccuracy(score.getHit100(), score.getHit50(), score.getMisses())
                     .version(ScoreVersion.V1)
                     .build();
             return physicalMap.getDifficulty(Mods.parse(mods)).getPerformance(s);

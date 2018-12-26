@@ -39,8 +39,13 @@ public class RecentCommand extends SimpleCommand {
         String user = flag ? LinkManager.read(DiscordEventHandler.lastMessage.getAuthor().getId()) : this.getArguments()[0];
         try {
             EndpointUserRecents.ArgumentsBuilder recent = new EndpointUserRecents.ArgumentsBuilder(user);
-            OsuScore score = OsuDiscord.INSTANCE.osuApi.userRecents.query(recent.build()).get(0);
-            DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeOsuScoreEmbed(score)).submit();
+            List<OsuScore> scores = OsuDiscord.INSTANCE.osuApi.userRecents.query(recent.build());
+            if (scores.isEmpty()) {
+                DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeErrorEmbed("No Recents for " + getArguments()[0], "Nuthin here :/", null)).submit();
+                return;
+            }
+            OsuScore score = scores.get(0);
+            DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeOsuScoreRecentEmbed(score)).submit();
         } catch (Exception e) {
             e.printStackTrace();
             DiscordEventHandler.lastMessage
