@@ -129,8 +129,8 @@ public class DiscordEventHandler {
                     "**激's**: " + score.getGekis() + " | **喝's**: " + score.getKatus() + " | **300's**: " + score.getHit300() + " | **100's**: " + score.getHit100() + " | **50's**: " + score.getHit50() + " | **X's**: " + score.getMisses() + "\n" +
                     "**Mark for beatmap** > " + score.getRank() + "\n" +
                     "**Max Combo Ratio** > " + score.getMaxCombo() + ":" + map.getMaxCombo() + "\n" +
-                    ((progress <= 90f) ? "**In-progress completion** >" + progress + "\n" : "") +
-                    mods.toString());
+                    ((progress <= 90f) ? "**Completion** >" + progress + "\n" : "") +
+                    (mods.toString().equals("**Mods**: ") ? "No-mod" : mods.toString()));
             builder.setImage("https://assets.ppy.sh/beatmaps/{}/covers/cover.jpg".replace("{}", "" + map.getBeatmapSetID()));
             return builder.build();
         }
