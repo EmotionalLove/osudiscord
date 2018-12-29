@@ -1,12 +1,7 @@
 package com.sasha.osudiscord.command;
 
-import com.oopsjpeg.osu4j.OsuBeatmap;
 import com.oopsjpeg.osu4j.OsuScore;
-import com.oopsjpeg.osu4j.OsuUser;
-import com.oopsjpeg.osu4j.backend.EndpointBeatmaps;
-import com.oopsjpeg.osu4j.backend.EndpointScores;
 import com.oopsjpeg.osu4j.backend.EndpointUserRecents;
-import com.oopsjpeg.osu4j.backend.EndpointUsers;
 import com.sasha.osudiscord.DiscordEventHandler;
 import com.sasha.osudiscord.LinkManager;
 import com.sasha.osudiscord.OsuDiscord;

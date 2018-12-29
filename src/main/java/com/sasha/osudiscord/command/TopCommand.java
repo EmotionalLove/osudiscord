@@ -32,7 +32,7 @@ public class TopCommand extends SimpleCommand {
         try {
             EndpointUsers.Arguments args = new EndpointUsers.ArgumentsBuilder(user).build();
             OsuUser osus = OsuDiscord.INSTANCE.osuApi.users.query(args);
-            DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeOsuScoreEmbed(osus.getTopScores(1).get().get(0))).submit();
+            DiscordEventHandler.lastMessage.getChannel().sendMessage(DiscordEventHandler.Util.makeOsuScoreRecentEmbed(osus.getTopScores(1).get().get(0))).submit();
         } catch (Exception e) {
             e.printStackTrace();
             DiscordEventHandler.lastMessage
